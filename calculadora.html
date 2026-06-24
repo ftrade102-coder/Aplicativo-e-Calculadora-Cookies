@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Precificação</title>
+<style>
+  :root{--cream:#FFF8F0;--paper:#FFFFFF;--choc:#4A2C1A;--choc-soft:#5C3A21;--amber:#D98324;--amber-dark:#B5641A;--caramel:#E9A23B;--ink:#3A2B20;--muted:#8A7560;--line:#ECDCC8;--gold:#F4E3CC;--ok:#3F7D52;--ok-bg:#EAF5EC;--warn:#B5641A;--warn-bg:#FBEEDD;}
+  *{box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;font-size:16px;}
+  .wrap{max-width:840px;margin:0 auto;padding:6px 22px 70px;}
+  h1,h2,h3{font-family:Georgia,"Times New Roman",serif;color:var(--choc);line-height:1.25;}
+  a{color:var(--amber-dark);}
+  .topbar{padding:14px 0 0;} .topbar a{display:inline-flex;gap:6px;text-decoration:none;font-weight:600;font-size:14px;}
+  .phead{background:linear-gradient(160deg,#5C3A21,#3A2113);color:#FCEFDD;border-radius:18px;padding:32px 34px;margin-top:8px;box-shadow:0 10px 30px rgba(74,44,26,.22);}
+  .phead .kicker{letter-spacing:3px;text-transform:uppercase;font-size:12px;color:var(--caramel);font-weight:700;}
+  .phead h1{color:#fff;font-size:34px;margin:6px 0 6px;} .phead p{color:#F4E3CC;margin:0;font-size:16.5px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:26px 30px;margin-top:22px;box-shadow:0 4px 14px rgba(74,44,26,.05);}
+  h2{font-size:24px;margin:0 0 12px;border-bottom:3px solid var(--gold);padding-bottom:10px;}
+  p{margin:10px 0;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;margin-top:6px;}
+  .field{display:flex;flex-direction:column;}
+  .field label{font-weight:700;color:var(--choc-soft);font-size:14px;margin-bottom:4px;}
+  .field .hint{font-weight:400;color:var(--muted);font-size:12.5px;}
+  .field .inwrap{position:relative;}
+  .field .pre{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;}
+  .field input{width:100%;padding:11px 12px 11px 30px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;background:#FFFDFA;color:var(--ink);}
+  .field input.nopre{padding-left:12px;}
+  .field input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(217,131,36,.15);}
+  .results{background:linear-gradient(160deg,#FBF1E4,#F6E7D2);border:1px solid #F0D7B4;border-radius:14px;padding:22px 24px;margin-top:18px;}
+  .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .rbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:center;}
+  .rbox .rl{font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;}
+  .rbox .rv{font-family:Georgia,serif;font-size:30px;color:var(--choc);font-weight:700;margin-top:4px;}
+  .rbox.big{grid-column:1 / -1;background:var(--amber);border:none;}
+  .rbox.big .rl{color:#5C3A21;} .rbox.big .rv{color:#3A2113;font-size:38px;}
+  .rbox.goal{grid-column:1 / -1;background:#2C1A10;border:none;}
+  .rbox.goal .rl{color:var(--caramel);} .rbox.goal .rv{color:#F4E3CC;font-size:24px;}
+  .box{border-radius:12px;padding:15px 18px;margin:16px 0;border:1px solid var(--line);}
+  .box .bt{font-weight:800;display:block;margin-bottom:4px;font-family:Georgia,serif;}
+  .tip{background:var(--ok-bg);border-color:#CFE6D4;} .tip .bt{color:var(--ok);}
+  footer{margin-top:36px;text-align:center;color:var(--muted);font-size:13px;}
+  @media (max-width:620px){.grid,.rgrid{grid-template-columns:1fr;}}
+  @page{margin:14mm;}
+  @media print{body{background:#fff;}.wrap{padding:0;}.card,.phead{box-shadow:none;}.no-print{display:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar no-print"><a href="index.html">← Voltar às ferramentas</a></div>
+
+  <div class="phead">
+    <span class="kicker">Módulo 04</span>
+    <h1>🧮 Calculadora de Precificação</h1>
+    <p>Coloque seus custos reais e descubra na hora o preço de venda e o lucro por cookie.</p>
+  </div>
+
+  <div class="card">
+    <h2>Preencha com os seus números</h2>
+    <p style="color:var(--muted);font-size:14.5px;margin-top:0">Pode usar vírgula (ex.: <em>18,50</em>). O resultado atualiza sozinho. 🔄</p>
+    <div class="grid">
+      <div class="field">
+        <label>Custo dos ingredientes <span class="hint">(por fornada)</span></label>
+        <div class="inwrap"><span class="pre">R$</span><input id="ingr" type="text" inputmode="decimal" value="22,00"></div>
+      </div>
+      <div class="field">
+        <label>Cookies por fornada <span class="hint">(quantidade)</span></label>
+        <div class="inwrap"><input class="nopre" id="qtd" type="text" inputmode="decimal" value="12"></div>
+      </div>
+      <div class="field">
+        <label>Embalagem <span class="hint">(por unidade)</span></label>
+        <div class="inwrap"><span class="pre">R$</span><input id="emb" type="text" inputmode="decimal" value="0,70"></div>
+      </div>
+      <div class="field">
+        <label>Gás / energia <span class="hint">(por fornada)</span></label>
+        <div class="inwrap"><span class="pre">R$</span><input id="gas" type="text" inputmode="decimal" value="2,00"></div>
+      </div>
+      <div class="field">
+        <label>Outros custos <span class="hint">(transporte, taxas — por fornada)</span></label>
+        <div class="inwrap"><span class="pre">R$</span><input id="out" type="text" inputmode="decimal" value="3,00"></div>
+      </div>
+      <div class="field">
+        <label>Markup desejado <span class="hint">(% acima do custo)</span></label>
+        <div class="inwrap"><input class="nopre" id="mk" type="text" inputmode="decimal" value="250"></div>
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="rgrid">
+        <div class="rbox"><div class="rl">Custo por cookie</div><div class="rv" id="rCusto">—</div></div>
+        <div class="rbox"><div class="rl">Lucro por cookie</div><div class="rv" id="rLucro">—</div></div>
+        <div class="rbox big"><div class="rl">Preço de venda sugerido</div><div class="rv" id="rPreco">—</div></div>
+        <div class="rbox"><div class="rl">Preço “redondo” p/ vitrine</div><div class="rv" id="rRedondo">—</div></div>
+        <div class="rbox"><div class="rl">Margem de lucro</div><div class="rv" id="rMargem">—</div></div>
+        <div class="rbox goal"><div class="rl">Para lucrar R$ 1.000 / semana, venda ~</div><div class="rv" id="rMeta">—</div></div>
+      </div>
+    </div>
+
+    <div class="box tip"><span class="bt">💡 Como ler o resultado</span><strong>Markup</strong> é quanto você soma por cima do custo. Markup de 250% significa preço ≈ 3,5× o custo — saudável para artesanal. Não desça de ~150%. Veja a lógica completa no <strong>Módulo 05 (Guia de Precificação)</strong>.</div>
+
+    <p style="font-size:13px;color:var(--muted)">⚠️ Esta é uma ferramenta de apoio. Compare sempre com o preço praticado na sua região. Não inclui impostos/encargos formais — ajuste conforme seu caso (MEI etc.).</p>
+  </div>
+
+  <footer>Renda Extra com Cookies • Módulo 04 — Calculadora</footer>
+</div>
+
+<script>
+  function num(id){
+    var v = document.getElementById(id).value || "";
+    v = v.replace(/\s/g,"").replace(/\./g,"").replace(",",".");
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  }
+  function brl(n){
+    return "R$ " + n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function arredonda(p){
+    // sobe para o ,90 mais próximo (preço psicológico)
+    if(p<=0) return 0;
+    var base = Math.floor(p);
+    var alvo = base + 0.90;
+    if(alvo < p) alvo = base + 1.90;
+    return alvo;
+  }
+  function calc(){
+    var ingr=num("ingr"), qtd=num("qtd"), emb=num("emb"), gas=num("gas"), out=num("out"), mk=num("mk");
+    if(qtd<=0){ qtd=1; }
+    var custoUnit = (ingr + gas + out)/qtd + emb;
+    var preco = custoUnit * (1 + mk/100);
+    var lucro = preco - custoUnit;
+    var margem = preco>0 ? (lucro/preco*100) : 0;
+    var redondo = arredonda(preco);
+    var lucroRedondo = redondo - custoUnit;
+    var meta = lucroRedondo>0 ? Math.ceil(1000/lucroRedondo) : 0;
+
+    document.getElementById("rCusto").textContent = brl(custoUnit);
+    document.getElementById("rLucro").textContent = brl(lucro);
+    document.getElementById("rPreco").textContent = brl(preco);
+    document.getElementById("rRedondo").textContent = brl(redondo);
+    document.getElementById("rMargem").textContent = margem.toFixed(0) + "%";
+    document.getElementById("rMeta").textContent = meta>0 ? (meta + " cookies (~" + Math.ceil(meta/6) + " caixas de 6)") : "—";
+  }
+  ["ingr","qtd","emb","gas","out","mk"].forEach(function(id){
+    document.getElementById(id).addEventListener("input", calc);
+  });
+  calc();
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3A2113">
+<title>Ferramentas — Renda Extra com Cookies</title>
+<style>
+  :root{--cream:#FFF8F0;--paper:#FFFFFF;--choc:#4A2C1A;--choc-soft:#5C3A21;--amber:#D98324;--amber-dark:#B5641A;--caramel:#E9A23B;--ink:#3A2B20;--muted:#8A7560;--line:#ECDCC8;--gold:#F4E3CC;--ok:#3F7D52;--ok-bg:#EAF5EC;--warn:#B5641A;--warn-bg:#FBEEDD;}
+  *{box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;font-size:16px;}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 20px 70px;}
+  h1,h2,h3{font-family:Georgia,"Times New Roman",serif;color:var(--choc);line-height:1.2;}
+  a{color:var(--amber-dark);}
+
+  .cover{background:linear-gradient(160deg,#5C3A21,#3A2113);color:#FCEFDD;border-radius:20px;padding:38px 30px;text-align:center;box-shadow:0 14px 40px rgba(74,44,26,.28);}
+  .cover .emoji{font-size:50px;line-height:1;display:block;margin-bottom:6px;}
+  .cover .kicker{letter-spacing:3px;text-transform:uppercase;font-size:12px;color:var(--caramel);font-weight:700;}
+  .cover h1{color:#fff;font-size:34px;margin:8px 0 6px;}
+  .cover p{font-size:16.5px;color:#F4E3CC;margin:6px auto 0;max-width:520px;}
+
+  .tool{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px 24px 22px;margin-top:20px;box-shadow:0 4px 14px rgba(74,44,26,.06);}
+  .tool .top{display:flex;gap:14px;align-items:flex-start;}
+  .tool .ico{font-size:38px;line-height:1;}
+  .tool h2{font-size:23px;margin:0 0 4px;border:none;padding:0;}
+  .tool .desc{color:var(--choc-soft);font-size:15px;margin:0;}
+  .acts{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:800;text-decoration:none;border-radius:12px;padding:14px 22px;font-size:15.5px;border:1.5px solid transparent;}
+  .btn-open{background:var(--amber);color:#fff;box-shadow:0 6px 16px rgba(217,131,36,.3);}
+  .btn-open:hover{background:var(--amber-dark);}
+  .btn-dl{background:#fff;border-color:var(--line);color:var(--choc-soft);}
+  .btn-dl:hover{border-color:var(--amber);color:var(--amber-dark);}
+
+  .box{border-radius:14px;padding:16px 20px;margin-top:20px;border:1px solid var(--line);font-size:14.5px;}
+  .box .bt{font-weight:800;display:block;margin-bottom:4px;font-family:Georgia,serif;}
+  .tip{background:var(--ok-bg);border-color:#CFE6D4;} .tip .bt{color:var(--ok);}
+  .warn{background:var(--warn-bg);border-color:#F0D7B4;} .warn .bt{color:var(--warn);}
+  .info{background:#F2F6FB;border-color:#D6E2F0;} .info .bt{color:#3A5A86;}
+  .box ul{margin:6px 0 0;padding-left:20px;} .box li{margin:5px 0;}
+
+  footer{margin-top:34px;text-align:center;color:var(--muted);font-size:13px;}
+  @media (max-width:520px){.acts .btn{flex:1;justify-content:center;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="cover">
+    <span class="emoji">🍪</span>
+    <span class="kicker">Renda Extra com Cookies</span>
+    <h1>Suas Ferramentas</h1>
+    <p>Use direto pelo navegador — no computador ou no celular, sem instalar nada. Ou baixe para usar offline.</p>
+  </div>
+
+  <!-- APP / PAINEL -->
+  <div class="tool">
+    <div class="top">
+      <span class="ico">📱</span>
+      <div>
+        <h2>App — Painel do Negócio</h2>
+        <p class="desc">Controle pedidos, caixa e a meta da semana num só lugar. Seus dados ficam salvos só no seu aparelho.</p>
+      </div>
+    </div>
+    <div class="acts">
+      <a class="btn btn-open" href="painel.html">▶️ Abrir o App</a>
+      <a class="btn btn-dl" href="painel.html" download="Painel do Negocio.html">⬇️ Baixar para usar offline</a>
+    </div>
+  </div>
+
+  <!-- CALCULADORA -->
+  <div class="tool">
+    <div class="top">
+      <span class="ico">🧮</span>
+      <div>
+        <h2>Calculadora de Precificação</h2>
+        <p class="desc">Coloque seus custos e descubra na hora o preço de venda, o lucro por cookie e quanto vender para bater a meta.</p>
+      </div>
+    </div>
+    <div class="acts">
+      <a class="btn btn-open" href="calculadora.html">▶️ Abrir a Calculadora</a>
+      <a class="btn btn-dl" href="calculadora.html" download="Calculadora de Precificacao.html">⬇️ Baixar para usar offline</a>
+    </div>
+  </div>
+
+  <div class="box tip">
+    <span class="bt">📲 Deixe na tela inicial do celular (vira “app”)</span>
+    Abra a ferramenta e:
+    <ul>
+      <li><strong>Android (Chrome):</strong> menu ⋮ → <em>“Adicionar à tela inicial”</em>.</li>
+      <li><strong>iPhone (Safari):</strong> botão Compartilhar (quadrado com seta) → <em>“Adicionar à Tela de Início”</em>.</li>
+    </ul>
+    Pronto: fica um ícone na tela e abre rapidinho, como um aplicativo.
+  </div>
+
+  <div class="box info">
+    <span class="bt">💾 Faça backup dos seus dados (importante)</span>
+    Tudo o que você digita no App fica salvo <strong>só no seu aparelho</strong> — nada vai para a internet. De vez em quando, abra a aba <strong>⚙️ Ajustes → ⬇️ Exportar backup</strong> e guarde o arquivo. Se trocar de celular ou limpar o navegador, é só <strong>Importar</strong> de volta.
+  </div>
+
+  <div class="box warn">
+    <span class="bt">Online x Baixado</span>
+    <ul>
+      <li>A versão <strong>online</strong> e a versão <strong>baixada</strong> guardam os dados separadamente — eles não passam sozinhos de uma para a outra. Para mover, use <strong>Exportar</strong> numa e <strong>Importar</strong> na outra.</li>
+      <li>No <strong>iPhone</strong>, o melhor é usar a versão <strong>online</strong> (a baixada é mais chata de abrir). E faça backup de vez em quando, porque o Safari pode limpar dados de páginas pouco usadas.</li>
+    </ul>
+  </div>
+
+  <footer>Renda Extra com Cookies • Ferramentas online • Seus dados ficam só no seu aparelho.</footer>
+</div>
+</body>
+</html>

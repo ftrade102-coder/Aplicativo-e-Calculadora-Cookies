@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3A2113">
+<title>Painel do Negócio — Renda Extra com Cookies</title>
+<style>
+  :root{--cream:#FFF8F0;--paper:#FFFFFF;--choc:#4A2C1A;--choc-soft:#5C3A21;--amber:#D98324;--amber-dark:#B5641A;--caramel:#E9A23B;--ink:#3A2B20;--muted:#8A7560;--line:#ECDCC8;--gold:#F4E3CC;--ok:#3F7D52;--ok-bg:#EAF5EC;--warn:#B5641A;--warn-bg:#FBEEDD;--danger:#B23A3A;--danger-bg:#FBECEC;}
+  *{box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;font-size:16px;}
+  h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;color:var(--choc);line-height:1.25;margin:0;}
+  a{color:var(--amber-dark);}
+  .app{max-width:780px;margin:0 auto;padding-bottom:60px;}
+
+  /* ===== Barra do app ===== */
+  .appbar{background:linear-gradient(160deg,#5C3A21,#3A2113);color:#FCEFDD;padding:18px 20px 16px;box-shadow:0 6px 20px rgba(74,44,26,.22);}
+  .appbar .kicker{letter-spacing:3px;text-transform:uppercase;font-size:11px;color:var(--caramel);font-weight:700;}
+  .brand-row{display:flex;align-items:center;gap:10px;margin-top:4px;}
+  .brand-row .ico{font-size:26px;line-height:1;}
+  #marca{flex:1;min-width:0;background:transparent;border:none;border-bottom:1.5px dashed rgba(244,227,204,.45);color:#fff;font-family:Georgia,serif;font-size:22px;font-weight:700;padding:2px 2px 4px;outline:none;}
+  #marca::placeholder{color:rgba(244,227,204,.6);font-style:italic;font-weight:400;}
+  .appbar .sub{color:#F4E3CC;font-size:13px;margin-top:6px;}
+  .voltar{display:inline-block;margin:10px 0 0;color:var(--caramel);text-decoration:none;font-size:13px;font-weight:600;}
+
+  /* ===== Abas ===== */
+  .tabs{position:sticky;top:0;z-index:20;display:flex;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 3px 10px rgba(74,44,26,.06);}
+  .tab-btn{flex:1;border:none;background:transparent;padding:13px 6px 11px;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .tab-btn .em{font-size:18px;}
+  .tab-btn.active{color:var(--choc);border-bottom-color:var(--amber);}
+
+  /* ===== Conteúdo ===== */
+  .panel{display:none;padding:18px 18px 0;}
+  .panel.active{display:block;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 14px rgba(74,44,26,.05);}
+  .card h2{font-size:21px;border-bottom:3px solid var(--gold);padding-bottom:8px;margin-bottom:12px;}
+  .card h3{font-size:16px;color:var(--amber-dark);margin:14px 0 8px;}
+  .lead{font-size:15px;color:var(--choc-soft);margin:0 0 10px;}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+  .stat{background:linear-gradient(160deg,#FFFDFA,#FBF4EA);border:1px solid var(--line);border-radius:14px;padding:14px 15px;}
+  .stat .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700;}
+  .stat .val{font-family:Georgia,serif;font-size:23px;color:var(--choc);margin-top:3px;font-weight:700;}
+  .stat.good .val{color:var(--ok);}
+  .stat.cost .val{color:var(--danger);}
+
+  /* Meta / progresso */
+  .meta-wrap{background:#FBF1E4;border:1px solid #F0D7B4;border-radius:14px;padding:16px;margin-top:4px;}
+  .meta-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px;}
+  .meta-top .big{font-family:Georgia,serif;font-size:22px;color:var(--amber-dark);font-weight:700;}
+  .meta-top .of{font-size:13px;color:var(--muted);}
+  .bar{height:18px;background:#EFE0CB;border-radius:20px;overflow:hidden;margin:10px 0 8px;border:1px solid #E6D2B4;}
+  .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--caramel));width:0;transition:width .4s ease;border-radius:20px;}
+  .meta-msg{font-size:14px;color:var(--choc-soft);margin:0;}
+  .meta-msg b{color:var(--amber-dark);}
+
+  /* Formulários */
+  form{margin:0;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;}
+  .field{display:flex;flex-direction:column;gap:4px;margin-bottom:4px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:12.5px;font-weight:700;color:var(--choc-soft);}
+  .field input[type=text],.field input[type=number],.field input[type=date]{font-family:inherit;font-size:15px;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:#FFFDFA;color:var(--ink);width:100%;}
+  .field input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(217,131,36,.15);}
+  .checks{display:flex;gap:18px;flex-wrap:wrap;margin:2px 0 6px;}
+  .checks label{display:flex;align-items:center;gap:7px;font-size:14.5px;font-weight:600;color:var(--choc-soft);cursor:pointer;}
+  .checks input{width:18px;height:18px;accent-color:var(--amber);}
+
+  /* Botões */
+  .btn{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:10px;padding:11px 16px;border:1px solid transparent;cursor:pointer;line-height:1;}
+  .btn-primary{background:var(--amber);color:#fff;box-shadow:0 4px 12px rgba(217,131,36,.3);}
+  .btn-primary:hover{background:var(--amber-dark);}
+  .btn-ghost{background:#fff;border-color:var(--line);color:var(--choc-soft);padding:8px 11px;font-size:13px;}
+  .btn-ghost:hover{border-color:var(--amber);color:var(--amber-dark);}
+  .btn-danger{background:var(--danger-bg);border-color:#EBC9C9;color:var(--danger);padding:8px 11px;font-size:13px;}
+  .btn-danger:hover{background:#F6DFDF;}
+  .btn-block{width:100%;margin-top:6px;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+
+  /* Listas */
+  .item{border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin-top:11px;background:#FFFDFA;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .item-main{min-width:0;flex:1;}
+  .item-main strong{font-size:15.5px;color:var(--choc);}
+  .item-sub{display:block;font-size:13.5px;color:var(--muted);margin-top:2px;}
+  .badges{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;}
+  .badge{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid;}
+  .b-ok{background:var(--ok-bg);color:var(--ok);border-color:#CFE6D4;}
+  .b-wait{background:var(--warn-bg);color:var(--warn);border-color:#F0D7B4;}
+  .b-due{background:var(--danger-bg);color:var(--danger);border-color:#EBC9C9;}
+  .item-acts{display:flex;flex-direction:column;gap:6px;align-items:stretch;}
+  .vazio{color:var(--muted);font-style:italic;text-align:center;padding:18px 0;margin:0;}
+  .tot-line{margin-top:12px;padding-top:12px;border-top:2px dashed var(--line);font-size:15px;color:var(--choc-soft);display:flex;justify-content:space-between;}
+  .tot-line b{color:var(--choc);}
+
+  /* Caixas de aviso */
+  .box{border-radius:12px;padding:13px 15px;margin:14px 0;border:1px solid var(--line);font-size:14px;}
+  .box .bt{font-weight:800;display:block;margin-bottom:3px;font-family:Georgia,serif;}
+  .tip{background:var(--ok-bg);border-color:#CFE6D4;} .tip .bt{color:var(--ok);}
+  .warn{background:var(--warn-bg);border-color:#F0D7B4;} .warn .bt{color:var(--warn);}
+  .info{background:#F2F6FB;border-color:#D6E2F0;} .info .bt{color:#3A5A86;}
+  .ls-alert{display:none;background:var(--danger-bg);border:1px solid #EBC9C9;color:var(--danger);border-radius:12px;padding:12px 14px;margin:14px 18px 0;font-size:13.5px;}
+
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12.5px;padding:0 18px;}
+
+  /* Receita (aba Receitas) */
+  .panel ol,.panel ul{padding-left:20px;} .panel li{margin:6px 0;}
+  .ingr{columns:2;column-gap:22px;padding-left:18px;margin-top:8px;} .ingr li{break-inside:avoid;}
+  .rmeta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;padding-left:0 !important;}
+  .rmeta .chip{list-style:none;background:#FBF1E4;border:1px solid #F0D7B4;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700;color:var(--amber-dark);margin:0;}
+  .rsteps{counter-reset:rs;list-style:none;padding-left:0 !important;}
+  .rsteps>li{position:relative;padding:3px 0 3px 42px;margin:13px 0;}
+  .rsteps>li::before{counter-increment:rs;content:counter(rs);position:absolute;left:0;top:0;width:30px;height:30px;background:var(--amber);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;box-shadow:0 3px 8px rgba(217,131,36,.3);}
+  .rsteps>li strong{color:var(--choc);}
+
+  @media (max-width:480px){
+    .ingr{columns:1;}
+    .grid{grid-template-columns:1fr;}
+    .item{flex-direction:column;}
+    .item-acts{flex-direction:row;flex-wrap:wrap;}
+    .tab-btn{font-size:11.5px;}
+    .tab-btn .em{font-size:17px;}
+  }
+
+  /* ===== Impressão: só o Resumo, limpo ===== */
+  @page{margin:14mm;}
+  @media print{
+    body{background:#fff;}
+    .tabs,.no-print,.voltar,.ls-alert{display:none !important;}
+    .panel{display:none !important;padding:0;}
+    #panel-resumo{display:block !important;}
+    .appbar{background:#fff;color:var(--choc);box-shadow:none;border-bottom:2px solid var(--gold);}
+    .appbar .kicker,.appbar .sub{color:var(--muted);}
+    #marca{color:var(--choc);border-bottom:none;}
+    .card{box-shadow:none;break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Barra do app ===== -->
+  <div class="appbar">
+    <span class="kicker">App • Painel do Negócio</span>
+    <div class="brand-row">
+      <span class="ico">🍪</span>
+      <input id="marca" type="text" maxlength="40" placeholder="Nome do seu negócio" aria-label="Nome do seu negócio">
+    </div>
+    <p class="sub">Seus pedidos, seu caixa e sua meta da semana — tudo num lugar só.</p>
+    <a class="voltar no-print" href="index.html">← Voltar às ferramentas</a>
+  </div>
+
+  <!-- ===== Abas ===== -->
+  <nav class="tabs no-print">
+    <button class="tab-btn active" data-action="tab" data-tab="resumo"><span class="em">🏠</span>Resumo</button>
+    <button class="tab-btn" data-action="tab" data-tab="pedidos"><span class="em">🧾</span>Pedidos</button>
+    <button class="tab-btn" data-action="tab" data-tab="caixa"><span class="em">💰</span>Caixa</button>
+    <button class="tab-btn" data-action="tab" data-tab="receitas"><span class="em">🍪</span>Receitas</button>
+    <button class="tab-btn" data-action="tab" data-tab="config"><span class="em">⚙️</span>Ajustes</button>
+  </nav>
+
+  <div class="ls-alert" id="ls-alert">⚠️ Não consegui salvar automaticamente neste navegador. Use o botão <strong>Exportar backup</strong> (aba Ajustes) para não perder seus dados.</div>
+
+  <!-- ===== RESUMO ===== -->
+  <section class="panel active" id="panel-resumo">
+    <div class="card">
+      <h2>📊 Resumo do mês</h2>
+      <div class="stats">
+        <div class="stat good"><div class="lbl">Faturamento</div><div class="val" id="s-fat">R$ 0,00</div></div>
+        <div class="stat cost"><div class="lbl">Custos</div><div class="val" id="s-cust">R$ 0,00</div></div>
+        <div class="stat good"><div class="lbl">Lucro</div><div class="val" id="s-lucro">R$ 0,00</div></div>
+        <div class="stat"><div class="lbl">Ticket médio</div><div class="val" id="s-ticket">R$ 0,00</div></div>
+        <div class="stat"><div class="lbl">Pedidos pagos</div><div class="val" id="s-vendas">0</div></div>
+        <div class="stat"><div class="lbl">A entregar</div><div class="val" id="s-pend">0</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Meta da semana</h2>
+      <div class="meta-wrap">
+        <div class="meta-top">
+          <span class="big" id="m-arrec">R$ 0,00</span>
+          <span class="of">de <strong id="m-meta">R$ 1.000,00</strong> nesta semana</span>
+        </div>
+        <div class="bar"><span id="m-bar"></span></div>
+        <p class="meta-msg" id="m-msg">Cadastre seus pedidos pagos e veja a barra encher. 💪</p>
+      </div>
+      <div class="box warn no-print" style="margin-bottom:0">
+        <span class="bt">Lembre-se</span>
+        A meta de R$ 1.000/semana é um <strong>exemplo de potencial</strong>, não uma garantia. O resultado depende do seu preço, da sua região e da sua divulgação.
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PEDIDOS ===== -->
+  <section class="panel" id="panel-pedidos">
+    <div class="card no-print">
+      <h2>➕ Novo pedido</h2>
+      <form id="form-pedido">
+        <div class="grid">
+          <div class="field full"><label>Cliente</label><input type="text" name="cliente" placeholder="Ex.: Ana do trabalho"></div>
+          <div class="field full"><label>Produto / sabor</label><input type="text" name="produto" placeholder="Ex.: Caixa 6 — Nutella"></div>
+          <div class="field"><label>Quantidade</label><input type="number" name="qtd" min="1" step="1" value="1" inputmode="numeric"></div>
+          <div class="field"><label>Valor por unidade (R$)</label><input type="text" name="valorUnit" inputmode="decimal" placeholder="0,00"></div>
+          <div class="field full"><label>Data de entrega</label><input type="date" name="data"></div>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" name="entregue"> Já entregue</label>
+          <label><input type="checkbox" name="pago"> Já pago</label>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Adicionar pedido</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>🧾 Meus pedidos</h2>
+      <div id="lista-pedidos"></div>
+    </div>
+  </section>
+
+  <!-- ===== CAIXA ===== -->
+  <section class="panel" id="panel-caixa">
+    <div class="card no-print">
+      <h2>💵 Entrada avulsa</h2>
+      <p class="lead">Vendeu no balcão, na feira ou para um vizinho sem cadastrar pedido? Registre aqui.</p>
+      <form id="form-entrada">
+        <div class="grid">
+          <div class="field full"><label>Descrição</label><input type="text" name="desc" placeholder="Ex.: Venda na feira de sábado"></div>
+          <div class="field"><label>Valor (R$)</label><input type="text" name="valor" inputmode="decimal" placeholder="0,00"></div>
+          <div class="field"><label>Data</label><input type="date" name="data"></div>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Registrar entrada</button>
+      </form>
+    </div>
+
+    <div class="card no-print">
+      <h2>🧂 Custo / saída</h2>
+      <p class="lead">Comprou ingredientes, embalagem, gás? Anote para saber seu lucro de verdade.</p>
+      <form id="form-custo">
+        <div class="grid">
+          <div class="field full"><label>Descrição</label><input type="text" name="desc" placeholder="Ex.: Chocolate + embalagens"></div>
+          <div class="field"><label>Valor (R$)</label><input type="text" name="valor" inputmode="decimal" placeholder="0,00"></div>
+          <div class="field"><label>Data</label><input type="date" name="data"></div>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Registrar custo</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>📥 Entradas avulsas</h2>
+      <div id="lista-entradas"></div>
+    </div>
+    <div class="card">
+      <h2>📤 Custos / saídas</h2>
+      <div id="lista-custos"></div>
+    </div>
+  </section>
+
+  <!-- ===== RECEITAS (COOKIES) ===== -->
+  <section class="panel" id="panel-receitas">
+    <div class="card">
+      <h2>🍪 Receitas dos Cookies</h2>
+      <p class="lead">Os 4 sabores campeões da sua oferta, todos feitos sobre a mesma <strong>Massa Base</strong>. Toque em um sabor para ir direto:</p>
+      <ul class="rmeta">
+        <li class="chip"><a href="#r-base" style="text-decoration:none;color:inherit">⭐ Massa Base</a></li>
+        <li class="chip"><a href="#r-nutella" style="text-decoration:none;color:inherit">🍫 Nutella</a></li>
+        <li class="chip"><a href="#r-kitkat" style="text-decoration:none;color:inherit">🟥 Kit Kat</a></li>
+        <li class="chip"><a href="#r-oreo" style="text-decoration:none;color:inherit">⚫ Oreo</a></li>
+        <li class="chip"><a href="#r-ferrero" style="text-decoration:none;color:inherit">🌰 Ferrero</a></li>
+      </ul>
+    </div>
+
+    <!-- MASSA BASE -->
+    <div class="card" id="r-base">
+      <h3>⭐ Massa Base (a base de tudo)</h3>
+      <p>Todas as receitas partem daqui. Faça a massa e depois adicione o “extra” de cada sabor.</p>
+      <ul class="ingr">
+        <li>150 g de manteiga sem sal (amolecida)</li>
+        <li>120 g de açúcar mascavo</li>
+        <li>80 g de açúcar refinado</li>
+        <li>1 ovo + 1 gema</li>
+        <li>1 colher (chá) de baunilha</li>
+        <li>290 g de farinha de trigo</li>
+        <li>½ colher (chá) de bicarbonato</li>
+        <li>½ colher (chá) de sal</li>
+      </ul>
+      <ol class="rsteps">
+        <li><strong>Bata a manteiga com os açúcares</strong> até virar um creme claro.</li>
+        <li><strong>Junte o ovo, a gema e a baunilha</strong> e misture.</li>
+        <li><strong>Adicione os secos</strong> (farinha, bicarbonato e sal) e misture <strong>pouco</strong>, só até dar liga.</li>
+        <li><strong>Acrescente o “extra” do sabor</strong> escolhido (veja abaixo) e boleie porções de ~70 g.</li>
+        <li><strong>Gele 30–60 min</strong> e asse a <strong>180 °C por 12–14 min</strong>. Rende ~12 cookies.</li>
+      </ol>
+      <div class="box star"><span class="bt">⭐ O segredo do centro cremoso</span>O recheio que “escorre” vem de colocar uma <strong>bolinha de recheio congelada no meio</strong> da massa antes de assar. Como entra gelada, derrete na hora certa e forma aquele núcleo molinho.</div>
+    </div>
+
+    <!-- NUTELLA -->
+    <div class="card" id="r-nutella">
+      <h3>🍫 Cookie Recheado de Nutella</h3>
+      <p>O campeão de pedidos: massa <em>double chocolate</em> com coração de Nutella derretida que escorre na mordida.</p>
+      <ul class="rmeta">
+        <li class="chip">🍽️ ~12 cookies</li>
+        <li class="chip">⭐ Fácil</li>
+        <li class="chip">💲 Custo ~R$ 3,00–3,80</li>
+        <li class="chip">🏷️ Venda R$ 12–16</li>
+      </ul>
+      <p style="margin-bottom:2px"><strong>Além da Massa Base:</strong></p>
+      <ul class="ingr">
+        <li>2 colheres (sopa) de cacau em pó</li>
+        <li>150 g de chocolate ao leite picado</li>
+        <li>1 pote de Nutella (para os recheios)</li>
+      </ul>
+      <ol class="rsteps">
+        <li><strong>Pré-recheio:</strong> faça ~12 bolinhas de Nutella sobre papel-manteiga e congele por 1 h.</li>
+        <li><strong>Massa:</strong> faça a Massa Base adicionando o cacau junto com a farinha; misture o chocolate por último.</li>
+        <li><strong>Montagem:</strong> abra a massa na mão, ponha uma bolinha de Nutella congelada no centro, feche bem e boleie.</li>
+        <li><strong>Gele e asse</strong> a 180 °C por 12–14 min.</li>
+        <li><strong>Finalize</strong> apertando pedaços de chocolate por cima ao sair do forno.</li>
+      </ol>
+      <div class="box tip"><span class="bt">📸 Diferencial</span>Parta ao meio ainda morno para a Nutella escorrer — é a foto que mais vende.</div>
+    </div>
+
+    <!-- KIT KAT -->
+    <div class="card" id="r-kitkat">
+      <h3>🟥 Cookie Kit Kat</h3>
+      <p>Crocância dentro e fora: pedaços de Kit Kat na massa, <em>drip</em> de chocolate e um quadradinho por cima.</p>
+      <ul class="rmeta">
+        <li class="chip">🍽️ ~12 cookies</li>
+        <li class="chip">⭐ Fácil</li>
+        <li class="chip">💲 Custo ~R$ 3,20–4,00</li>
+        <li class="chip">🏷️ Venda R$ 13–17</li>
+      </ul>
+      <p style="margin-bottom:2px"><strong>Além da Massa Base:</strong></p>
+      <ul class="ingr">
+        <li>3 a 4 barras de Kit Kat (picadas)</li>
+        <li>120 g de chocolate ao leite picado</li>
+        <li>100 g de chocolate ao leite (para o drip)</li>
+      </ul>
+      <ol class="rsteps">
+        <li><strong>Massa:</strong> prepare a Massa Base. Reserve alguns pedaços para decorar e misture o restante + o chocolate picado.</li>
+        <li><strong>Boleie e gele</strong> as porções (30–60 min).</li>
+        <li><strong>Asse</strong> a 180 °C por 12–14 min; espete um pedaço de Kit Kat por cima assim que sair.</li>
+        <li><strong>Drip:</strong> derreta os 100 g de chocolate e regue em fios, deixando escorrer pelas bordas.</li>
+      </ol>
+      <div class="box tip"><span class="bt">📸 Diferencial</span>O drip escorrendo + o quadradinho em pé dão cara de loja gourmet. Decore só depois de frio para o chocolate firmar.</div>
+    </div>
+
+    <!-- OREO -->
+    <div class="card" id="r-oreo">
+      <h3>⚫ Cookie Oreo (Cookies &amp; Cream)</h3>
+      <p>Massa baunilha com pedaços de Oreo e chocolate branco, meia bolacha de coroa.</p>
+      <ul class="rmeta">
+        <li class="chip">🍽️ ~12 cookies</li>
+        <li class="chip">⭐ Fácil</li>
+        <li class="chip">💲 Custo ~R$ 3,00–3,80</li>
+        <li class="chip">🏷️ Venda R$ 12–16</li>
+      </ul>
+      <p style="margin-bottom:2px"><strong>Além da Massa Base:</strong></p>
+      <ul class="ingr">
+        <li>1 pacote de Oreo (~9 bolachas, quebradas)</li>
+        <li>150 g de chocolate branco (gotas ou picado)</li>
+        <li>4 a 6 bolachas Oreo extras (cortadas ao meio, para decorar)</li>
+      </ul>
+      <ol class="rsteps">
+        <li><strong>Massa:</strong> faça a Massa Base <em>sem cacau</em> (cor clara). Misture o chocolate branco e os pedaços de Oreo por último, delicadamente.</li>
+        <li><strong>Boleie e gele</strong> (30–60 min).</li>
+        <li><strong>Asse</strong> a 180 °C por 12–14 min. <strong>Atenção:</strong> chocolate branco queima fácil — fique de olho no fim.</li>
+        <li><strong>Finalize</strong> com meia bolacha Oreo por cima ainda quente.</li>
+      </ol>
+      <div class="box tip"><span class="bt">📸 Diferencial</span>O contraste do preto da Oreo com o creme da massa fica lindo na foto. Não exagere no chocolate branco.</div>
+    </div>
+
+    <!-- FERRERO -->
+    <div class="card" id="r-ferrero">
+      <h3>🌰 Cookie Ferrero Rocher</h3>
+      <p>O premium: avelã torrada, recheio cremoso de avelã/chocolate e meio Ferrero coroando. Vende mais caro com facilidade.</p>
+      <ul class="rmeta">
+        <li class="chip">🍽️ ~12 cookies</li>
+        <li class="chip">⭐ Média</li>
+        <li class="chip">💲 Custo ~R$ 4,00–5,00</li>
+        <li class="chip">🏷️ Venda R$ 16–22</li>
+      </ul>
+      <p style="margin-bottom:2px"><strong>Além da Massa Base:</strong></p>
+      <ul class="ingr">
+        <li>2 colheres (sopa) de cacau em pó</li>
+        <li>80 g de avelãs torradas e picadas (ou amendoim, p/ baratear)</li>
+        <li>150 g de chocolate ao leite picado</li>
+        <li>Nutella ou ganache de avelã (recheio congelado)</li>
+        <li>6 bombons Ferrero Rocher (cortados ao meio, p/ decorar)</li>
+      </ul>
+      <ol class="rsteps">
+        <li><strong>Recheio:</strong> congele ~12 bolinhas de Nutella/ganache de avelã (1 h no freezer).</li>
+        <li><strong>Massa:</strong> faça a Massa Base com o cacau; misture as avelãs e o chocolate por último.</li>
+        <li><strong>Montagem:</strong> recheie cada porção com uma bolinha congelada, vede e boleie (passe por mais avelã por fora, se quiser).</li>
+        <li><strong>Gele e asse</strong> a 180 °C por 13–14 min.</li>
+        <li><strong>Finalize</strong> com meio Ferrero por cima + um fio de chocolate derretido.</li>
+      </ol>
+      <div class="box star"><span class="bt">💰 Diferencial de margem</span>O Ferrero passa “sofisticação” e as pessoas pagam mais por ele. É o seu produto de <strong>maior ticket</strong> — ótimo para caixas presenteáveis e datas comemorativas.</div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Custo × venda (resumo)</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <tr style="background:#F4E3CC"><th style="border:1px solid var(--line);padding:8px;text-align:left;font-family:Georgia,serif;">Sabor</th><th style="border:1px solid var(--line);padding:8px;text-align:left;font-family:Georgia,serif;">Custo</th><th style="border:1px solid var(--line);padding:8px;text-align:left;font-family:Georgia,serif;">Venda</th><th style="border:1px solid var(--line);padding:8px;text-align:left;font-family:Georgia,serif;">Lucro aprox.</th></tr>
+        <tr><td style="border:1px solid var(--line);padding:8px;">Nutella</td><td style="border:1px solid var(--line);padding:8px;">R$ 3,00–3,80</td><td style="border:1px solid var(--line);padding:8px;">R$ 12–16</td><td style="border:1px solid var(--line);padding:8px;">~R$ 9–12</td></tr>
+        <tr><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">Kit Kat</td><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">R$ 3,20–4,00</td><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">R$ 13–17</td><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">~R$ 10–13</td></tr>
+        <tr><td style="border:1px solid var(--line);padding:8px;">Oreo</td><td style="border:1px solid var(--line);padding:8px;">R$ 3,00–3,80</td><td style="border:1px solid var(--line);padding:8px;">R$ 12–16</td><td style="border:1px solid var(--line);padding:8px;">~R$ 9–12</td></tr>
+        <tr><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">Ferrero</td><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">R$ 4,00–5,00</td><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">R$ 16–22</td><td style="border:1px solid var(--line);padding:8px;background:#FCF6EE;">~R$ 12–17</td></tr>
+      </table>
+      <div class="box info" style="margin-bottom:0"><span class="bt">📲 Vendeu?</span>Valores ilustrativos — confirme os seus na <a href="calculadora.html">Calculadora</a> e cadastre a venda na aba <strong>🧾 Pedidos</strong> para a barra da meta subir!</div>
+    </div>
+  </section>
+
+  <!-- ===== CONFIG / BACKUP ===== -->
+  <section class="panel" id="panel-config">
+    <div class="card">
+      <h2>⚙️ Configurações</h2>
+      <div class="grid">
+        <div class="field"><label>Meta por semana (R$)</label><input type="text" id="meta" inputmode="decimal" placeholder="1.000,00"></div>
+        <div class="field"><label>Preço médio do cookie (R$)</label><input type="text" id="preco" inputmode="decimal" placeholder="9,90"></div>
+      </div>
+      <p class="lead" style="margin-top:6px">O preço médio é usado só para mostrar “quantos cookies faltam” para bater a meta. Calcule o seu preço certo na <a href="calculadora.html">Calculadora</a>.</p>
+    </div>
+
+    <div class="card">
+      <h2>💾 Backup dos seus dados</h2>
+      <div class="box info">
+        <span class="bt">Importante: onde ficam seus dados</span>
+        Tudo o que você digita fica salvo <strong>só neste aparelho/navegador</strong> — nada vai para a internet (de graça e particular). Se você trocar de celular, limpar o navegador ou desinstalar, os dados sem backup somem. Por isso, <strong>exporte um backup de vez em quando</strong>.
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" data-action="exportar">⬇️ Exportar backup</button>
+        <button class="btn btn-ghost" data-action="importar">⬆️ Importar backup</button>
+        <button class="btn btn-ghost" data-action="imprimir">🖨️ Imprimir / PDF do resumo</button>
+        <button class="btn btn-danger" data-action="limpar">🗑️ Apagar tudo</button>
+      </div>
+      <input type="file" id="arquivo-import" accept="application/json,.json" style="display:none">
+    </div>
+
+    <div class="card no-print">
+      <h2>📱 Como usar como app no celular</h2>
+      <ol style="padding-left:20px;margin:6px 0">
+        <li>Abra este endereço no <strong>navegador do celular</strong> (Chrome no Android, Safari no iPhone).</li>
+        <li>Toque no menu (⋮ no Android / Compartilhar no iPhone) → <strong>“Adicionar à tela inicial”</strong>.</li>
+        <li>Pronto: vira um ícone na tela e abre como um app.</li>
+      </ol>
+      <div class="box tip" style="margin-bottom:0">
+        <span class="bt">Dica de ouro</span>
+        Pegue o hábito de registrar cada pedido na hora. Em 1 mês você terá um raio-x do seu negócio — e vai saber exatamente o que vende mais. Veja a parte manual no <strong>Módulo 14</strong> e a matemática da meta no <strong>Módulo 09</strong>.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="box warn" style="margin:0">
+        <span class="bt">Aviso</span>
+        Material educativo. Os valores são exemplos de <strong>potencial</strong>, não garantia de ganho. Ao crescer, informe-se sobre <strong>MEI</strong> e a vigilância sanitária da sua cidade (veja o Módulo 10).
+      </div>
+    </div>
+  </section>
+
+  <footer>Renda Extra com Cookies • App — Painel do Negócio • Seus dados ficam só no seu aparelho.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "rec_painel_v1";
+  var LS_OK = true;
+
+  function defState(){ return { marca:"", metaSemanal:1000, precoMedio:9.9, pedidos:[], entradas:[], custos:[] }; }
+  var state = defState();
+
+  /* ---------- Persistência ---------- */
+  function carregar(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){ return Object.assign(defState(), JSON.parse(raw)); }
+    }catch(e){ LS_OK = false; }
+    return defState();
+  }
+  function salvar(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch(e){ LS_OK = false; document.getElementById('ls-alert').style.display = 'block'; }
+  }
+
+  /* ---------- Utilidades ---------- */
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function parseNum(v){
+    if(typeof v === 'number') return v;
+    if(!v) return 0;
+    v = String(v).trim().replace(/[R$\s]/g,'');
+    if(v.indexOf(',') > -1){ v = v.replace(/\./g,'').replace(',', '.'); }
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  }
+  function fmtBRL(n){ return (Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+  function hoje(){
+    var d = new Date(), m = (d.getMonth()+1), dia = d.getDate();
+    return d.getFullYear() + '-' + (m<10?'0':'') + m + '-' + (dia<10?'0':'') + dia;
+  }
+  function parseData(s){ if(!s) return null; var p = s.split('-'); return new Date(+p[0], (+p[1])-1, +p[2]); }
+  function fmtData(s){ if(!s) return '—'; var p = s.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function inicioSemana(d){
+    var dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var dia = dt.getDay();              // 0=dom ... 6=sáb
+    var diff = (dia === 0) ? -6 : (1 - dia); // volta para segunda
+    dt.setDate(dt.getDate() + diff);
+    dt.setHours(0,0,0,0);
+    return dt;
+  }
+  function naSemanaAtual(s){
+    var d = parseData(s); if(!d) return false;
+    var ini = inicioSemana(new Date());
+    var fim = new Date(ini); fim.setDate(ini.getDate()+6); fim.setHours(23,59,59,999);
+    return d >= ini && d <= fim;
+  }
+  function noMesAtual(s){
+    var d = parseData(s); if(!d) return false;
+    var now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }
+  function totalPedido(p){ return (Number(p.qtd)||0) * (Number(p.valorUnit)||0); }
+
+  /* ---------- Cálculos ---------- */
+  function faturamentoMes(){
+    var t = 0;
+    state.pedidos.forEach(function(p){ if(p.pago && noMesAtual(p.data)) t += totalPedido(p); });
+    state.entradas.forEach(function(e){ if(noMesAtual(e.data)) t += (Number(e.valor)||0); });
+    return t;
+  }
+  function custosMes(){
+    var t = 0;
+    state.custos.forEach(function(c){ if(noMesAtual(c.data)) t += (Number(c.valor)||0); });
+    return t;
+  }
+  function vendasMesCount(){
+    var n = 0;
+    state.pedidos.forEach(function(p){ if(p.pago && noMesAtual(p.data)) n++; });
+    state.entradas.forEach(function(e){ if(noMesAtual(e.data)) n++; });
+    return n;
+  }
+  function arrecadadoSemana(){
+    var t = 0;
+    state.pedidos.forEach(function(p){ if(p.pago && naSemanaAtual(p.data)) t += totalPedido(p); });
+    state.entradas.forEach(function(e){ if(naSemanaAtual(e.data)) t += (Number(e.valor)||0); });
+    return t;
+  }
+
+  /* ---------- Render ---------- */
+  function renderResumo(){
+    var fat = faturamentoMes(), cust = custosMes(), lucro = fat - cust;
+    var nv = vendasMesCount(), ticket = nv ? fat/nv : 0;
+    var pend = state.pedidos.filter(function(p){ return !p.entregue; }).length;
+    document.getElementById('s-fat').textContent = fmtBRL(fat);
+    document.getElementById('s-cust').textContent = fmtBRL(cust);
+    document.getElementById('s-lucro').textContent = fmtBRL(lucro);
+    document.getElementById('s-ticket').textContent = fmtBRL(ticket);
+    document.getElementById('s-vendas').textContent = nv;
+    document.getElementById('s-pend').textContent = pend;
+
+    var meta = Number(state.metaSemanal)||0;
+    var arrec = arrecadadoSemana();
+    var pct = meta > 0 ? Math.min(100, (arrec/meta)*100) : 0;
+    var faltam = Math.max(0, meta - arrec);
+    var preco = Number(state.precoMedio)||0;
+    document.getElementById('m-arrec').textContent = fmtBRL(arrec);
+    document.getElementById('m-meta').textContent = fmtBRL(meta);
+    document.getElementById('m-bar').style.width = pct + '%';
+    var msg;
+    if(meta <= 0){
+      msg = 'Defina sua meta semanal na aba <b>Ajustes</b>.';
+    } else if(faltam <= 0){
+      msg = '🎉 <b>Meta batida!</b> Você já fez ' + fmtBRL(arrec) + ' esta semana. Bora pra próxima!';
+    } else {
+      msg = 'Faltam <b>' + fmtBRL(faltam) + '</b> para a meta';
+      if(preco > 0){ msg += ' — cerca de <b>' + Math.ceil(faltam/preco) + ' cookies</b> a ' + fmtBRL(preco) + '.'; }
+      else { msg += '.'; }
+    }
+    document.getElementById('m-msg').innerHTML = msg;
+  }
+
+  function renderPedidos(){
+    var cont = document.getElementById('lista-pedidos');
+    if(!state.pedidos.length){ cont.innerHTML = '<p class="vazio">Nenhum pedido ainda. Adicione o primeiro acima 👆</p>'; return; }
+    var arr = state.pedidos.slice().sort(function(a,b){ return (a.data < b.data) ? 1 : (a.data > b.data ? -1 : 0); });
+    var html = arr.map(function(p){
+      return '<div class="item">' +
+          '<div class="item-main">' +
+            '<strong>' + escapeHtml(p.cliente || '—') + '</strong>' +
+            '<span class="item-sub">' + escapeHtml(p.produto || 'Cookie') + ' • ' + (Number(p.qtd)||0) + '× ' + fmtBRL(p.valorUnit) + ' = <strong>' + fmtBRL(totalPedido(p)) + '</strong></span>' +
+            '<span class="item-sub">📅 ' + fmtData(p.data) + '</span>' +
+            '<div class="badges">' +
+              '<span class="badge ' + (p.entregue?'b-ok':'b-wait') + '">' + (p.entregue?'✅ Entregue':'⏳ A entregar') + '</span>' +
+              '<span class="badge ' + (p.pago?'b-ok':'b-due') + '">' + (p.pago?'💵 Pago':'🕗 A receber') + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item-acts no-print">' +
+            '<button class="btn btn-ghost" data-action="togglePago" data-id="' + p.id + '">' + (p.pago?'Desmarcar pago':'Marcar pago') + '</button>' +
+            '<button class="btn btn-ghost" data-action="toggleEntregue" data-id="' + p.id + '">' + (p.entregue?'Desmarcar entregue':'Marcar entregue') + '</button>' +
+            '<button class="btn btn-danger" data-action="delPedido" data-id="' + p.id + '">Excluir</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+    cont.innerHTML = html;
+  }
+
+  function renderLancamentos(lista, contId, action, vazioMsg){
+    var cont = document.getElementById(contId);
+    if(!lista.length){ cont.innerHTML = '<p class="vazio">' + vazioMsg + '</p>'; return; }
+    var total = 0;
+    var arr = lista.slice().sort(function(a,b){ return (a.data < b.data) ? 1 : (a.data > b.data ? -1 : 0); });
+    var html = arr.map(function(x){
+      total += (Number(x.valor)||0);
+      return '<div class="item">' +
+          '<div class="item-main">' +
+            '<strong>' + escapeHtml(x.desc || '—') + '</strong>' +
+            '<span class="item-sub">📅 ' + fmtData(x.data) + ' • <strong>' + fmtBRL(x.valor) + '</strong></span>' +
+          '</div>' +
+          '<div class="item-acts no-print">' +
+            '<button class="btn btn-danger" data-action="' + action + '" data-id="' + x.id + '">Excluir</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+    html += '<div class="tot-line"><span>Total</span><b>' + fmtBRL(total) + '</b></div>';
+    cont.innerHTML = html;
+  }
+
+  function renderTudo(){
+    renderResumo();
+    renderPedidos();
+    renderLancamentos(state.entradas, 'lista-entradas', 'delEntrada', 'Nenhuma entrada avulsa registrada.');
+    renderLancamentos(state.custos, 'lista-custos', 'delCusto', 'Nenhum custo registrado ainda.');
+  }
+
+  function sincronizarInputs(){
+    document.getElementById('marca').value = state.marca || '';
+    document.getElementById('meta').value = state.metaSemanal ? String(state.metaSemanal).replace('.', ',') : '';
+    document.getElementById('preco').value = state.precoMedio ? state.precoMedio.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '';
+  }
+
+  /* ---------- Abas ---------- */
+  function switchTab(name){
+    var panels = document.querySelectorAll('.panel');
+    for(var i=0;i<panels.length;i++){ panels[i].classList.toggle('active', panels[i].id === 'panel-' + name); }
+    var btns = document.querySelectorAll('.tab-btn');
+    for(var j=0;j<btns.length;j++){ btns[j].classList.toggle('active', btns[j].getAttribute('data-tab') === name); }
+    window.scrollTo(0,0);
+  }
+
+  /* ---------- Backup ---------- */
+  function exportar(){
+    try{
+      var data = JSON.stringify(state, null, 2);
+      var blob = new Blob([data], {type:'application/json'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'backup-painel-cookies-' + hoje() + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    }catch(e){ alert('Não foi possível gerar o backup neste navegador.'); }
+  }
+  function importarArquivo(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var obj = JSON.parse(reader.result);
+        state = Object.assign(defState(), obj);
+        salvar(); sincronizarInputs(); renderTudo();
+        alert('Backup importado com sucesso! ✅');
+      }catch(err){ alert('Arquivo inválido. Selecione um backup .json gerado por este app.'); }
+    };
+    reader.readAsText(file);
+  }
+
+  /* ---------- Eventos ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    var action = btn.getAttribute('data-action');
+    var id = btn.getAttribute('data-id');
+
+    if(action === 'tab'){ switchTab(btn.getAttribute('data-tab')); return; }
+
+    if(action === 'togglePago'){ var p=find(state.pedidos,id); if(p){ p.pago=!p.pago; salvar(); renderTudo(); } return; }
+    if(action === 'toggleEntregue'){ var q=find(state.pedidos,id); if(q){ q.entregue=!q.entregue; salvar(); renderTudo(); } return; }
+    if(action === 'delPedido'){ if(confirm('Excluir este pedido?')){ state.pedidos = remove(state.pedidos,id); salvar(); renderTudo(); } return; }
+    if(action === 'delEntrada'){ if(confirm('Excluir esta entrada?')){ state.entradas = remove(state.entradas,id); salvar(); renderTudo(); } return; }
+    if(action === 'delCusto'){ if(confirm('Excluir este custo?')){ state.custos = remove(state.custos,id); salvar(); renderTudo(); } return; }
+
+    if(action === 'exportar'){ exportar(); return; }
+    if(action === 'importar'){ document.getElementById('arquivo-import').click(); return; }
+    if(action === 'imprimir'){ switchTab('resumo'); setTimeout(function(){ window.print(); }, 120); return; }
+    if(action === 'limpar'){
+      if(confirm('Tem certeza? Isso apaga TODOS os pedidos, entradas e custos deste aparelho. (Faça um backup antes!)')){
+        var marca = state.marca, meta = state.metaSemanal, preco = state.precoMedio;
+        state = defState(); state.marca = marca; state.metaSemanal = meta; state.precoMedio = preco;
+        salvar(); renderTudo();
+        alert('Tudo limpo. Seus ajustes (meta e preço) foram mantidos.');
+      }
+      return;
+    }
+  });
+
+  function find(arr,id){ for(var i=0;i<arr.length;i++){ if(arr[i].id===id) return arr[i]; } return null; }
+  function remove(arr,id){ return arr.filter(function(x){ return x.id !== id; }); }
+
+  document.getElementById('form-pedido').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = e.target;
+    var p = {
+      id: uid(),
+      cliente: f.cliente.value.trim(),
+      produto: f.produto.value.trim(),
+      qtd: parseInt(f.qtd.value,10) || 1,
+      valorUnit: parseNum(f.valorUnit.value),
+      data: f.data.value || hoje(),
+      entregue: f.entregue.checked,
+      pago: f.pago.checked
+    };
+    if(!p.cliente && !p.produto){ alert('Preencha pelo menos o cliente ou o produto.'); return; }
+    state.pedidos.push(p);
+    salvar(); renderTudo();
+    f.reset(); f.qtd.value = 1; f.data.value = hoje();
+    f.cliente.focus();
+  });
+
+  document.getElementById('form-entrada').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = e.target;
+    var valor = parseNum(f.valor.value);
+    if(valor <= 0){ alert('Informe um valor maior que zero.'); return; }
+    state.entradas.push({ id: uid(), desc: f.desc.value.trim() || 'Venda avulsa', valor: valor, data: f.data.value || hoje() });
+    salvar(); renderTudo();
+    f.reset(); f.data.value = hoje();
+  });
+
+  document.getElementById('form-custo').addEventListener('submit', function(e){
+    e.preventDefault();
+    var f = e.target;
+    var valor = parseNum(f.valor.value);
+    if(valor <= 0){ alert('Informe um valor maior que zero.'); return; }
+    state.custos.push({ id: uid(), desc: f.desc.value.trim() || 'Custo', valor: valor, data: f.data.value || hoje() });
+    salvar(); renderTudo();
+    f.reset(); f.data.value = hoje();
+  });
+
+  document.getElementById('marca').addEventListener('input', function(){ state.marca = this.value; salvar(); });
+  document.getElementById('meta').addEventListener('change', function(){ state.metaSemanal = parseNum(this.value); salvar(); renderResumo(); });
+  document.getElementById('preco').addEventListener('change', function(){ state.precoMedio = parseNum(this.value); salvar(); renderResumo(); });
+  document.getElementById('arquivo-import').addEventListener('change', function(e){
+    var file = e.target.files[0]; if(file){ importarArquivo(file); } e.target.value = '';
+  });
+
+  /* ---------- Início ---------- */
+  state = carregar();
+  sincronizarInputs();
+  // datas padrão = hoje
+  var dts = document.querySelectorAll('input[type=date]');
+  for(var k=0;k<dts.length;k++){ if(!dts[k].value) dts[k].value = hoje(); }
+  renderTudo();
+  if(!LS_OK){ document.getElementById('ls-alert').style.display = 'block'; }
+})();
+</script>
+</body>
+</html>
